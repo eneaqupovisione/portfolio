@@ -109,8 +109,7 @@
   <div class="grid" id="portfolio-grid"></div>
 
   <script>
-    // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Per "brushed" non forziamo la classe "big", così seguono l'ordine naturale.
+    // Definizione degli elementi "big" per ogni categoria
     const bigPhotos = {
       brushed: [],
       lightPainting: [],
@@ -122,45 +121,72 @@
     };
 
     // Mappatura personalizzata per la categoria "brushed"
-    // Le chiavi sono i nomi dei file originali, i valori sono le versioni modificate.
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
       "127.jpg": "128.jpg",
       "115.jpg": "119.jpg"
     };
 
-    // Funzione che crea gli elementi della griglia basandosi sui dati JSON
-    function createGridItems(data) {
+    // Funzione per calcolare lo span delle righe per un grid-item
+    function resizeGridItem(item) {
       const grid = document.getElementById('portfolio-grid');
-      Object.keys(data).forEach(category => {
-        // Ordina numericamente i file in ogni categoria
-        data[category].sort((a, b) => parseInt(a) - parseInt(b));
-        data[category].forEach(fileName => {
-          // Per "brushed": mostra solo i file originali (quelle che sono chiavi nel mapping)
-          if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
-            return; // Salta i file che sono destinazioni
-          }
+      const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+      const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
+      const contentHeight = item.querySelector('img').getBoundingClientRect().height;
+      const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
+      item.style.gridRowEnd = "span " + rowSpan;
+    }
+
+    // Funzione per ridimensionare tutti gli elementi della griglia
+    function resizeAllGridItems() {
+      const allItems = document.querySelectorAll('.grid-item');
+      allItems.forEach(item => resizeGridItem(item));
+    }
+
+    // Caricamento del file JSON e creazione della galleria
+    fetch('images.json')
+      .then(response => response.json())
+      .then(data => {
+        // Combina tutte le immagini in un unico array
+        const allImages = [];
+        Object.keys(data).forEach(category => {
+          data[category].forEach(fileName => {
+            // Per "brushed": mostra solo i file originali, evitando quelli che sono destinazioni nella mappatura
+            if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) return;
+            allImages.push({ fileName, category });
+          });
+        });
+
+        // Ordina numericamente le immagini in base al numero estratto dal nome (es. "001.jpg" -> 1)
+        allImages.sort((a, b) => {
+          const numA = parseInt(a.fileName.replace(/\D/g, ""));
+          const numB = parseInt(b.fileName.replace(/\D/g, ""));
+          return numA - numB;
+        });
+
+        // Creazione degli elementi della griglia
+        const grid = document.getElementById('portfolio-grid');
+        allImages.forEach(({ fileName, category }) => {
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
-          
-          // Per le altre categorie, applica "big" se definito in bigPhotos
-          if (category !== "brushed" && bigPhotos[category] && bigPhotos[category].includes(fileName)) {
+
+          // Aggiungi la classe "big" se definita per la categoria (esclusa "brushed")
+          if (category !== "brushed" && bigPhotos[category]?.includes(fileName)) {
             gridItem.classList.add('big');
           }
-          
+
           const img = document.createElement('img');
-          // Costruisci il percorso: si assume che la cartella abbia lo stesso nome della categoria
           img.src = `${category}/${fileName}`;
           img.alt = fileName;
           gridItem.appendChild(img);
-          
-          // Se la categoria è "brushed", aggiungi la dinamica per alternare la versione modificata
+
+          // Gestione delle immagini "brushed" con versione modificata al click
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
-            let modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
+            const modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
-            
+
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
             overlay.textContent = "Clicca per modificare";
@@ -168,7 +194,7 @@
 
             gridItem.addEventListener("click", function(e) {
               e.stopPropagation();
-              let currentState = gridItem.getAttribute("data-state");
+              const currentState = gridItem.getAttribute("data-state");
               if (currentState === "original") {
                 img.src = gridItem.getAttribute("data-modified");
                 gridItem.setAttribute("data-state", "modified");
@@ -180,48 +206,25 @@
               }
             });
           }
-          
+
           grid.appendChild(gridItem);
-          img.addEventListener('load', () => {
-            resizeGridItem(gridItem);
-          });
+          img.addEventListener('load', () => resizeGridItem(gridItem));
         });
-      });
-    }
 
-    // Calcola e imposta lo span delle righe per un grid-item in base all'altezza dell'immagine
-    function resizeGridItem(item) {
-      const grid = document.getElementById('portfolio-grid');
-      const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
-      const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
-      const contentHeight = item.querySelector('img').getBoundingClientRect().height;
-      const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
-      item.style.gridRowEnd = "span " + rowSpan;
-    }
-
-    // Ridimensiona tutti gli elementi della griglia
-    function resizeAllGridItems() {
-      const allItems = document.querySelectorAll('.grid-item');
-      allItems.forEach(item => resizeGridItem(item));
-    }
-
-    // Carica il file JSON e crea la galleria
-    fetch('images.json')
-      .then(response => response.json())
-      .then(data => {
-        createGridItems(data);
         setTimeout(resizeAllGridItems, 500);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
 
-    // Funzionalità di filtro
+    // Funzionalità di filtro per la navigazione
     const navLinks = document.querySelectorAll('.portfolio-nav a');
     navLinks.forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const filter = this.getAttribute('data-filter');
+        // Aggiorna lo stato attivo del menu
         navLinks.forEach(l => l.classList.remove('active'));
         this.classList.add('active');
+
         const gridItems = document.querySelectorAll('.grid-item');
         gridItems.forEach(item => {
           if (filter === 'all' || item.classList.contains(filter)) {
@@ -230,14 +233,14 @@
             item.classList.add('hidden');
           }
         });
-        // Se il filtro "Tutte" è attivo, riordina i grid-item in base al valore numerico estratto dall'attributo alt
+
+        // Se il filtro "Tutte" è attivo, riordina i grid-item in base al numero estratto dall'attributo alt
         if (filter === 'all') {
           const gridContainer = document.getElementById('portfolio-grid');
           const itemsArray = Array.from(gridContainer.querySelectorAll('.grid-item'));
           itemsArray.sort((a, b) => {
-            // Rimuove l'estensione dal nome (es. "057.jpg" -> "057") e usa parseInt per il confronto
-            const aName = parseInt(a.querySelector('img').alt.replace(/\.[^/.]+$/, ""));
-            const bName = parseInt(b.querySelector('img').alt.replace(/\.[^/.]+$/, ""));
+            const aName = parseInt(a.querySelector('img').alt.replace(/\D/g, ""));
+            const bName = parseInt(b.querySelector('img').alt.replace(/\D/g, ""));
             return aName - bName;
           });
           itemsArray.forEach(item => gridContainer.appendChild(item));
