@@ -2,8 +2,9 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Portfolio Mosaico Gratuito</title>
+  <title>Portfolio Mosaico</title>
   <style>
+    /* Stili di base */
     body {
       margin: 0;
       font-family: sans-serif;
@@ -33,22 +34,20 @@
     .portfolio-nav a:hover {
       color: #007BFF;
     }
-    /* Contenitore della griglia */
+    /* Griglia delle immagini con CSS Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      grid-auto-rows: 10px;  /* Altezza di base per riga, verrà usato in combinazione con il dense layout */
+      grid-auto-rows: 10px; /* Altezza base per riga */
       grid-auto-flow: dense;
       gap: 10px;
       padding: 1rem;
     }
-    /* Elementi della griglia */
     .grid-item {
       position: relative;
       overflow: hidden;
       transition: transform 0.3s ease;
     }
-    /* Immagini che si adattano al contenitore */
     .grid-item img {
       width: 100%;
       height: auto;
@@ -59,7 +58,7 @@
       transform: scale(1.05);
       z-index: 2;
     }
-    /* Elementi "big" che occupano più spazio */
+    /* Elementi "big" occupano più spazio nella griglia */
     .grid-item.big {
       grid-column: span 2;
       grid-row: span 2;
@@ -72,71 +71,79 @@
 </head>
 <body>
 
-  <!-- Menu di navigazione (puoi posizionarlo anche a lato se preferisci) -->
+  <!-- Menu di navigazione -->
   <nav class="portfolio-nav">
     <ul>
       <li><a href="#" data-filter="all" class="active">Tutte</a></li>
-      <li><a href="#" data-filter="best">Best Pictures</a></li>
-      <li><a href="#" data-filter="landscape">Landscape</a></li>
-      <li><a href="#" data-filter="portrait">Portrait</a></li>
-      <!-- Aggiungi altre categorie se necessario -->
+      <li><a href="#" data-filter="brushed">Brushed</a></li>
+      <li><a href="#" data-filter="lightPainting">Light Painting</a></li>
+      <li><a href="#" data-filter="longExposurePortraits">Long Exposure</a></li>
+      <li><a href="#" data-filter="mezzoBustoPrimoPiano">Mezzo Bust / Primo Piano</a></li>
+      <li><a href="#" data-filter="moda">Moda</a></li>
+      <li><a href="#" data-filter="stillLife">Still Life</a></li>
+      <li><a href="#" data-filter="trip">Trip</a></li>
     </ul>
   </nav>
 
-  <!-- Griglia delle immagini -->
+  <!-- Contenitore della griglia -->
   <div class="grid" id="portfolio-grid">
-    <!-- Esempi di immagini: assegna le classi per filtrare e per le dimensioni -->
-    <div class="grid-item best big">
-      <img src="img/001.jpg" alt="Foto 1">
-    </div>
-    <div class="grid-item best">
-      <img src="img/002.jpg" alt="Foto 2">
-    </div>
-    <div class="grid-item landscape big">
-      <img src="img/003.jpg" alt="Foto 3">
-    </div>
-    <div class="grid-item portrait">
-      <img src="img/004.jpg" alt="Foto 4">
-    </div>
-    <div class="grid-item best">
-      <img src="img/005.jpg" alt="Foto 5">
-    </div>
-    <div class="grid-item landscape">
-      <img src="img/006.jpg" alt="Foto 6">
-    </div>
-    <!-- Aggiungi qui tutte le altre immagini, assegnando le classi corrispondenti -->
+    <!-- Gli elementi verranno inseriti dinamicamente -->
   </div>
 
-  <!-- Script JavaScript per il filtro -->
+  <!-- Script JavaScript per caricare il JSON e creare la galleria -->
   <script>
-    // Seleziona i link del menu e gli elementi della griglia
-    const navLinks = document.querySelectorAll('.portfolio-nav a');
-    const gridItems = document.querySelectorAll('.grid-item');
-
-    // Aggiunge un listener per ogni link di filtro
-    navLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const filter = this.getAttribute('data-filter');
-
-        // Aggiorna lo stato "active" del menu
-        navLinks.forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-
-        // Mostra/nascondi gli elementi in base al filtro
-        gridItems.forEach(item => {
-          if (filter === 'all') {
-            item.classList.remove('hidden');
-          } else {
-            if (item.classList.contains(filter)) {
-              item.classList.remove('hidden');
-            } else {
-              item.classList.add('hidden');
+    // Carica il file JSON (assicurati che images.json si trovi nella stessa cartella di index.html)
+    fetch('images.json')
+      .then(response => response.json())
+      .then(data => {
+        const grid = document.getElementById('portfolio-grid');
+        // Per ogni categoria presente nel JSON
+        Object.keys(data).forEach(category => {
+          // Per ogni file immagine in quella categoria
+          data[category].forEach((fileName, index) => {
+            const gridItem = document.createElement('div');
+            // Aggiunge la classe della categoria (per il filtro)
+            gridItem.classList.add('grid-item', category);
+            // Esempio: per alcuni elementi (ad es. ogni quarto) aggiungiamo la classe "big"
+            if (index % 4 === 0) {
+              gridItem.classList.add('big');
             }
-          }
+            const img = document.createElement('img');
+            // Costruisce il percorso: si assume che le immagini siano nella cartella con il nome della categoria
+            img.src = `${category}/${fileName}`;
+            img.alt = fileName;
+            gridItem.appendChild(img);
+            grid.appendChild(gridItem);
+          });
         });
-      });
-    });
+
+        // Funzionalità di filtro
+        const navLinks = document.querySelectorAll('.portfolio-nav a');
+        const gridItems = document.querySelectorAll('.grid-item');
+
+        navLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filter = this.getAttribute('data-filter');
+            // Aggiorna lo stato "active" nel menu
+            navLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            // Mostra/nasconde gli elementi in base al filtro
+            gridItems.forEach(item => {
+              if (filter === 'all') {
+                item.classList.remove('hidden');
+              } else {
+                if (item.classList.contains(filter)) {
+                  item.classList.remove('hidden');
+                } else {
+                  item.classList.add('hidden');
+                }
+              }
+            });
+          });
+        });
+      })
+      .catch(error => console.error('Errore nel caricamento del JSON:', error));
   </script>
 
 </body>
