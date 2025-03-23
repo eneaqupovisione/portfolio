@@ -57,7 +57,7 @@
     .grid-item.big {
       grid-column: span 2;
     }
-    /* Effetto hover marcato: zoom forte e box-shadow, portando l'immagine in primo piano */
+    /* Effetto hover marcato: zoom forte e box-shadow */
     .grid-item:hover {
       transform: scale(1.5);
       z-index: 10;
@@ -104,7 +104,7 @@
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
     const bigPhotos = {
-      brushed: ["057.jpg", "119.jpg"], // Eventuali immagini da visualizzare in grande
+      brushed: ["057.jpg", "119.jpg"],
       lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
       mezzoBustoPrimoPiano: [],
@@ -114,7 +114,7 @@
     };
 
     // Mappatura personalizzata per la categoria "brushed"
-    // Le chiavi sono i nomi delle immagini originali, i valori sono le destinazioni modificate.
+    // Le chiavi sono i nomi dei file originali, i valori sono i nomi dei file destinazione.
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
       "127.jpg": "128.jpg",
@@ -126,6 +126,10 @@
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
         data[category].forEach(fileName => {
+          // Per la categoria "brushed", salta i file che sono destinazioni (cioè quelli che compaiono tra i valori della mappatura)
+          if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
+            return; // Salta questo file
+          }
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
           
@@ -154,7 +158,7 @@
             overlay.textContent = "Clicca per modificare";
             gridItem.appendChild(overlay);
 
-            // Aggiungi un event listener per il click che alterna la versione dell'immagine
+            // Aggiungi un event listener per alternare la versione dell'immagine al click
             gridItem.addEventListener("click", function(e) {
               e.stopPropagation();
               let currentState = gridItem.getAttribute("data-state");
