@@ -47,6 +47,7 @@
       position: relative;
       overflow: hidden;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transform-origin: center center; /* Zoom dal centro */
     }
     .grid-item img {
       width: 100%;
@@ -103,8 +104,9 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
+    // Per le categorie diverse da "brushed", usa questo oggetto; per "brushed" forziamo tutti a essere grandi.
     const bigPhotos = {
-      brushed: ["057.jpg", "119.jpg"],
+      brushed: [], // Non usato: per "brushed" forziamo sempre la classe "big"
       lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
       mezzoBustoPrimoPiano: [],
@@ -114,27 +116,31 @@
     };
 
     // Mappatura personalizzata per la categoria "brushed"
-    // Le chiavi sono i nomi dei file originali, i valori sono i nomi dei file destinazione.
+    // Le chiavi sono i nomi dei file originali, i valori sono le versioni modificate.
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
-      "127.jpg": "128.jpg",
-      "115.jpg": "119.jpg"
+      "127.jpg": "119.jpg",
+      "115.jpg": "128.jpg"
     };
 
     // Funzione che crea gli elementi della griglia basandosi sui dati JSON
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
+        // Ordina numericamente i file (estrazione del numero dal nome, es. "057.jpg")
+        data[category].sort((a, b) => parseInt(a) - parseInt(b));
         data[category].forEach(fileName => {
-          // Per la categoria "brushed", salta i file che sono destinazioni (cioè quelli che compaiono tra i valori della mappatura)
+          // Per "brushed": mostra solo le immagini originali (quelle che sono chiavi nella mappatura)
           if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
-            return; // Salta questo file
+            return; // Salta i file che sono destinazioni
           }
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
           
-          // Se il file è definito come "big" per la categoria, aggiungi la classe "big"
-          if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
+          // Per la categoria "brushed", forziamo la visualizzazione "big" per tutti gli elementi
+          if (category === "brushed") {
+            gridItem.classList.add('big');
+          } else if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
             gridItem.classList.add('big');
           }
           
