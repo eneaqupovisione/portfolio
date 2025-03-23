@@ -113,6 +113,15 @@
       trip: []
     };
 
+    // Mappatura personalizzata per la categoria "brushed"
+    // Sostituisci le coppie con i nomi effettivi: 'nome_originale': 'nome_modificato'
+    const customBrushedMapping = {
+      "057.jpg": "057_custom.jpg",
+      "068.jpg": "068_custom.jpg",
+      "115.jpg": "115_custom.jpg"
+      // Aggiungi altre coppie se necessario
+    };
+
     // Funzione che crea gli elementi della griglia basandosi sui dati JSON
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
@@ -134,13 +143,12 @@
           
           // Se la categoria è "brushed", aggiungi la dinamica per mostrare la versione modificata
           if (category === "brushed") {
-            // Imposta lo stato iniziale
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
-            // Costruisci il percorso della versione modificata aggiungendo il suffisso _mod prima dell'estensione
-            let modifiedSrc = img.src.replace(/(\.[^.]+)$/, '_mod$1');
+            // Usa la mappatura personalizzata se presente, altrimenti, potresti decidere un fallback
+            let modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
-
+            
             // Crea l'overlay con l'istruzione
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
@@ -149,7 +157,6 @@
 
             // Aggiungi un event listener per il click che alterna la versione dell'immagine
             gridItem.addEventListener("click", function(e) {
-              // Impedisci che il click si propaghi ad altri elementi
               e.stopPropagation();
               let currentState = gridItem.getAttribute("data-state");
               if (currentState === "original") {
@@ -183,7 +190,7 @@
       item.style.gridRowEnd = "span " + rowSpan;
     }
 
-    // Ridimensiona tutti gli elementi della griglia (utile al resize della finestra o dopo il filtro)
+    // Ridimensiona tutti gli elementi della griglia (utile al ridimensionamento della finestra o dopo il filtro)
     function resizeAllGridItems() {
       const allItems = document.querySelectorAll('.grid-item');
       allItems.forEach(item => resizeGridItem(item));
@@ -194,7 +201,6 @@
       .then(response => response.json())
       .then(data => {
         createGridItems(data);
-        // Dopo il caricamento, ridimensiona tutti gli elementi (ritardo per consentire il caricamento delle immagini)
         setTimeout(resizeAllGridItems, 500);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
@@ -205,10 +211,8 @@
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const filter = this.getAttribute('data-filter');
-        // Aggiorna lo stato "active" nel menu
         navLinks.forEach(l => l.classList.remove('active'));
         this.classList.add('active');
-        // Re-query degli elementi della griglia
         const gridItems = document.querySelectorAll('.grid-item');
         gridItems.forEach(item => {
           if (filter === 'all' || item.classList.contains(filter)) {
@@ -217,12 +221,10 @@
             item.classList.add('hidden');
           }
         });
-        // Ridimensiona la griglia dopo il filtraggio
         resizeAllGridItems();
       });
     });
 
-    // Ridimensiona la griglia al ridimensionamento della finestra
     window.addEventListener('resize', resizeAllGridItems);
   </script>
 
