@@ -54,7 +54,7 @@
       height: auto;
       display: block;
     }
-    /* Le immagini "big" occupano più colonne (modifica questo valore per regolare le dimensioni) */
+    /* Le immagini "big", "extra-big" o "mega-big" regolano quante colonne occupano */
     .grid-item.big {
       grid-column: span 1.4;
     }
@@ -110,9 +110,9 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Per "brushed" non forziamo la classe "big", in modo che seguano il loro ordine naturale.
+    // Per "brushed" non forziamo la classe "big" così da mantenere l'ordine naturale.
     const bigPhotos = {
-      brushed: [], // Non forzato, seguono l'ordine numerico
+      brushed: [],
       lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
       mezzoBustoPrimoPiano: [],
@@ -125,26 +125,26 @@
     // Le chiavi sono i nomi dei file originali, i valori sono le versioni modificate.
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
-      "127.jpg": "119.jpg",
-      "115.jpg": "128.jpg"
+      "127.jpg": "128.jpg",
+      "115.jpg": "119.jpg"
     };
 
     // Funzione che crea gli elementi della griglia basandosi sui dati JSON
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
-        // Ordina numericamente i file (es. "057.jpg" -> 57)
+        // Ordina numericamente i file in ogni categoria (es. "057.jpg" -> 57)
         data[category].sort((a, b) => parseInt(a) - parseInt(b));
         data[category].forEach(fileName => {
-          // Per "brushed": mostra solo i file originali (quelle che sono chiavi nella mappatura)
+          // Per "brushed": mostra solo i file originali (quelle che sono chiavi nel mapping)
           if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
             return; // Salta i file che sono destinazioni
           }
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
           
-          // Applica la classe "big" solo se definita in bigPhotos per categorie diverse da "brushed"
-          if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
+          // Per le altre categorie, applica "big" se definito in bigPhotos
+          if (category !== "brushed" && bigPhotos[category] && bigPhotos[category].includes(fileName)) {
             gridItem.classList.add('big');
           }
           
@@ -158,17 +158,14 @@
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
-            // Se esiste una mappatura personalizzata per questo file, usa il percorso modificato
             let modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
             
-            // Crea l'overlay con l'istruzione
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
             overlay.textContent = "Clicca per modificare";
             gridItem.appendChild(overlay);
 
-            // Alterna la versione dell'immagine al click
             gridItem.addEventListener("click", function(e) {
               e.stopPropagation();
               let currentState = gridItem.getAttribute("data-state");
@@ -203,7 +200,7 @@
       item.style.gridRowEnd = "span " + rowSpan;
     }
 
-    // Ridimensiona tutti gli elementi della griglia (utile al ridimensionamento della finestra o dopo il filtro)
+    // Ridimensiona tutti gli elementi della griglia
     function resizeAllGridItems() {
       const allItems = document.querySelectorAll('.grid-item');
       allItems.forEach(item => resizeGridItem(item));
@@ -234,6 +231,18 @@
             item.classList.add('hidden');
           }
         });
+        // Se si seleziona "Tutte", ordina globalmente i grid-item per nome (numerico)
+        if(filter === 'all'){
+          const gridContainer = document.getElementById('portfolio-grid');
+          const itemsArray = Array.from(gridContainer.querySelectorAll('.grid-item'));
+          itemsArray.sort((a, b) => {
+            const aName = a.querySelector('img').alt;
+            const bName = b.querySelector('img').alt;
+            return parseInt(aName) - parseInt(bName);
+          });
+          itemsArray.forEach(item => gridContainer.removeChild(item));
+          itemsArray.forEach(item => gridContainer.appendChild(item));
+        }
         resizeAllGridItems();
       });
     });
