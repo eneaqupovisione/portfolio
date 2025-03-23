@@ -38,8 +38,7 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      /* Impostiamo una base per il calcolo dello span */
-      grid-auto-rows: 10px;
+      grid-auto-rows: 10px; /* Base per il calcolo dello span */
       gap: 10px;
       padding: 1rem;
     }
@@ -54,17 +53,17 @@
       height: auto;
       display: block;
     }
-    /* Gli elementi "big" occupano più colonne */
+    /* Le immagini "big" occupano 2 colonne */
     .grid-item.big {
       grid-column: span 2;
     }
-    /* Effetto hover marcato: zoom forte e ombra per portare l'immagine in primo piano */
+    /* Effetto hover marcato: zoom forte e box-shadow, portando l'immagine in primo piano */
     .grid-item:hover {
       transform: scale(1.5);
       z-index: 10;
       box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
-    /* Nasconde gli elementi per il filtro */
+    /* Classe per nascondere gli elementi per il filtro */
     .hidden {
       display: none;
     }
@@ -90,8 +89,8 @@
   <div class="grid" id="portfolio-grid"></div>
 
   <script>
-    // Configurazione manuale: specifica quali immagini (per categoria) devono essere "big"
-    // Modifica questi array per definire quali immagini devono occupare più spazio
+    // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
+    // Aggiungi o modifica gli array per ogni categoria secondo le tue preferenze.
     const bigPhotos = {
       brushed: ["057.jpg", "119.jpg"],
       lightPainting: [],
@@ -102,24 +101,25 @@
       trip: []
     };
 
-    // Funzione che crea gli elementi della griglia basandosi sul JSON
+    // Funzione che crea gli elementi della griglia basandosi sui dati JSON
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
         data[category].forEach(fileName => {
           const gridItem = document.createElement('div');
+          // Aggiunge le classi: "grid-item" e la categoria (per il filtro)
           gridItem.classList.add('grid-item', category);
-          // Se l'immagine è definita come "big" per la categoria, aggiungi la classe "big"
+          // Se il file è definito come "big" per la categoria, aggiungi la classe "big"
           if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
             gridItem.classList.add('big');
           }
           const img = document.createElement('img');
-          // Costruisci il percorso in base alla cartella (nome categoria) e al file
+          // Costruisci il percorso: si assume che la cartella abbia lo stesso nome della categoria
           img.src = `${category}/${fileName}`;
           img.alt = fileName;
           gridItem.appendChild(img);
           grid.appendChild(gridItem);
-          // Dopo il caricamento dell'immagine, ridimensiona l'elemento
+          // Dopo che l'immagine è stata caricata, ridimensiona l'elemento
           img.addEventListener('load', () => {
             resizeGridItem(gridItem);
           });
@@ -127,7 +127,7 @@
       });
     }
 
-    // Funzione per calcolare e impostare lo span delle righe per un grid-item
+    // Calcola e imposta lo span delle righe per un grid-item, in base all'altezza dell'immagine
     function resizeGridItem(item) {
       const grid = document.getElementById('portfolio-grid');
       const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
@@ -137,12 +137,10 @@
       item.style.gridRowEnd = "span " + rowSpan;
     }
 
-    // Ridimensiona tutti gli elementi della griglia (utile su resize)
+    // Ridimensiona tutti gli elementi della griglia (utile al ridimensionamento della finestra o dopo il filtro)
     function resizeAllGridItems() {
-      const allItems = document.getElementsByClassName('grid-item');
-      for (let item of allItems) {
-        resizeGridItem(item);
-      }
+      const allItems = document.querySelectorAll('.grid-item');
+      allItems.forEach(item => resizeGridItem(item));
     }
 
     // Carica il file JSON e crea la galleria
@@ -150,35 +148,35 @@
       .then(response => response.json())
       .then(data => {
         createGridItems(data);
-        // Dopo aver creato tutti gli elementi, ridimensiona l'intera griglia
+        // Dopo aver creato gli elementi, ridimensiona la griglia (ritardo per consentire il caricamento delle immagini)
         setTimeout(resizeAllGridItems, 500);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
 
-    // Funzionalità di filtro
+    // Funzionalità di filtro: ogni volta che si clicca, re-query delle grid-item per avere tutti gli elementi aggiornati
     const navLinks = document.querySelectorAll('.portfolio-nav a');
-    function setupFilters() {
-      const gridItems = document.querySelectorAll('.grid-item');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const filter = this.getAttribute('data-filter');
-          navLinks.forEach(l => l.classList.remove('active'));
-          this.classList.add('active');
-          gridItems.forEach(item => {
-            if (filter === 'all' || item.classList.contains(filter)) {
-              item.classList.remove('hidden');
-            } else {
-              item.classList.add('hidden');
-            }
-          });
-          // Ridimensiona la griglia dopo il filtraggio
-          resizeAllGridItems();
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const filter = this.getAttribute('data-filter');
+        // Aggiorna lo stato "active" nel menu
+        navLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        // Re-query delle grid-item per ottenere l'elenco aggiornato
+        const gridItems = document.querySelectorAll('.grid-item');
+        gridItems.forEach(item => {
+          if (filter === 'all' || item.classList.contains(filter)) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
         });
+        // Ridimensiona la griglia dopo il filtraggio
+        resizeAllGridItems();
       });
-    }
-    setupFilters();
+    });
 
+    // Aggiorna la griglia al ridimensionamento della finestra
     window.addEventListener('resize', resizeAllGridItems);
   </script>
 
