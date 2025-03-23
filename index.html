@@ -110,7 +110,7 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Per "brushed" non forziamo la classe "big", in modo che seguano l'ordine naturale.
+    // Per "brushed" non forziamo la classe "big", così seguono l'ordine naturale.
     const bigPhotos = {
       brushed: [],
       lightPainting: [],
@@ -230,21 +230,16 @@
             item.classList.add('hidden');
           }
         });
-        // Se il filtro "Tutte" è selezionato, forza l'ordinamento per nome numerico
+        // Se il filtro "Tutte" è attivo, riordina i grid-item in base al valore numerico estratto dall'attributo alt
         if (filter === 'all') {
           const gridContainer = document.getElementById('portfolio-grid');
           const itemsArray = Array.from(gridContainer.querySelectorAll('.grid-item'));
-          // Genera l'array di ordine desiderato da "001" a "130"
-          const desiredOrder = [];
-          for (let i = 1; i <= 130; i++) {
-            desiredOrder.push(String(i).padStart(3, "0"));
-          }
           itemsArray.sort((a, b) => {
-            const aName = a.querySelector('img').alt;
-            const bName = b.querySelector('img').alt;
-            return desiredOrder.indexOf(aName) - desiredOrder.indexOf(bName);
+            // Rimuove l'estensione dal nome (es. "057.jpg" -> "057") e usa parseInt per il confronto
+            const aName = parseInt(a.querySelector('img').alt.replace(/\.[^/.]+$/, ""));
+            const bName = parseInt(b.querySelector('img').alt.replace(/\.[^/.]+$/, ""));
+            return aName - bName;
           });
-          // Riordina gli elementi nel container
           itemsArray.forEach(item => gridContainer.appendChild(item));
         }
         resizeAllGridItems();
