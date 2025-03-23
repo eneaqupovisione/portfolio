@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Portfolio Mosaico</title>
+  <title>Portfolio Mosaico Integrale</title>
   <style>
     /* Stili di base */
     body {
@@ -34,10 +34,12 @@
     .portfolio-nav a:hover {
       color: #007BFF;
     }
-    /* Griglia delle immagini */
+    /* Contenitore della griglia */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      /* Impostiamo una base per il calcolo dello span */
+      grid-auto-rows: 10px;
       gap: 10px;
       padding: 1rem;
     }
@@ -52,17 +54,17 @@
       height: auto;
       display: block;
     }
-    /* Gli elementi "big" occupano più spazio (2 colonne) */
+    /* Gli elementi "big" occupano più colonne */
     .grid-item.big {
       grid-column: span 2;
     }
-    /* Effetto hover: zoom marcato e ombra per portare l'immagine in primo piano */
+    /* Effetto hover marcato: zoom forte e ombra per portare l'immagine in primo piano */
     .grid-item:hover {
-      transform: scale(1.3);
+      transform: scale(1.5);
       z-index: 10;
       box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
-    /* Classe per nascondere gli elementi durante il filtro */
+    /* Nasconde gli elementi per il filtro */
     .hidden {
       display: none;
     }
@@ -87,63 +89,97 @@
   <!-- Contenitore della griglia -->
   <div class="grid" id="portfolio-grid"></div>
 
-  <!-- Script JavaScript -->
   <script>
-    // Oggetto per definire quali immagini devono essere "big" per ogni categoria
-    // Modifica questo oggetto per definire le immagini che vuoi ingrandire
+    // Configurazione manuale: specifica quali immagini (per categoria) devono essere "big"
+    // Modifica questi array per definire quali immagini devono occupare più spazio
     const bigPhotos = {
       brushed: ["057.jpg", "119.jpg"],
+      lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
-      // Aggiungi altre definizioni se necessario
-      // Esempio: lightPainting: ["002.jpg"]
+      mezzoBustoPrimoPiano: [],
+      moda: [],
+      stillLife: [],
+      trip: []
     };
 
-    // Carica il file JSON (images.json) che contiene l'elenco delle immagini per categoria
+    // Funzione che crea gli elementi della griglia basandosi sul JSON
+    function createGridItems(data) {
+      const grid = document.getElementById('portfolio-grid');
+      Object.keys(data).forEach(category => {
+        data[category].forEach(fileName => {
+          const gridItem = document.createElement('div');
+          gridItem.classList.add('grid-item', category);
+          // Se l'immagine è definita come "big" per la categoria, aggiungi la classe "big"
+          if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
+            gridItem.classList.add('big');
+          }
+          const img = document.createElement('img');
+          // Costruisci il percorso in base alla cartella (nome categoria) e al file
+          img.src = `${category}/${fileName}`;
+          img.alt = fileName;
+          gridItem.appendChild(img);
+          grid.appendChild(gridItem);
+          // Dopo il caricamento dell'immagine, ridimensiona l'elemento
+          img.addEventListener('load', () => {
+            resizeGridItem(gridItem);
+          });
+        });
+      });
+    }
+
+    // Funzione per calcolare e impostare lo span delle righe per un grid-item
+    function resizeGridItem(item) {
+      const grid = document.getElementById('portfolio-grid');
+      const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+      const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
+      const contentHeight = item.querySelector('img').getBoundingClientRect().height;
+      const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
+      item.style.gridRowEnd = "span " + rowSpan;
+    }
+
+    // Ridimensiona tutti gli elementi della griglia (utile su resize)
+    function resizeAllGridItems() {
+      const allItems = document.getElementsByClassName('grid-item');
+      for (let item of allItems) {
+        resizeGridItem(item);
+      }
+    }
+
+    // Carica il file JSON e crea la galleria
     fetch('images.json')
       .then(response => response.json())
       .then(data => {
-        const grid = document.getElementById('portfolio-grid');
-        // Per ogni categoria presente nel JSON
-        Object.keys(data).forEach(category => {
-          data[category].forEach(fileName => {
-            const gridItem = document.createElement('div');
-            // Aggiungi la classe della categoria per il filtro
-            gridItem.classList.add('grid-item', category);
-            // Se in questa categoria l'immagine è definita come "big", aggiungi la classe "big"
-            if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
-              gridItem.classList.add('big');
-            }
-            const img = document.createElement('img');
-            // Costruisci il percorso: si assume che la cartella delle immagini abbia lo stesso nome della categoria
-            img.src = `${category}/${fileName}`;
-            img.alt = fileName;
-            gridItem.appendChild(img);
-            grid.appendChild(gridItem);
-          });
-        });
-
-        // Imposta il filtro
-        const navLinks = document.querySelectorAll('.portfolio-nav a');
-        const gridItems = document.querySelectorAll('.grid-item');
-        navLinks.forEach(link => {
-          link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const filter = this.getAttribute('data-filter');
-            // Aggiorna lo stato "active" nel menu
-            navLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            // Mostra o nascondi gli elementi in base al filtro
-            gridItems.forEach(item => {
-              if (filter === 'all' || item.classList.contains(filter)) {
-                item.classList.remove('hidden');
-              } else {
-                item.classList.add('hidden');
-              }
-            });
-          });
-        });
+        createGridItems(data);
+        // Dopo aver creato tutti gli elementi, ridimensiona l'intera griglia
+        setTimeout(resizeAllGridItems, 500);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
+
+    // Funzionalità di filtro
+    const navLinks = document.querySelectorAll('.portfolio-nav a');
+    function setupFilters() {
+      const gridItems = document.querySelectorAll('.grid-item');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const filter = this.getAttribute('data-filter');
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          gridItems.forEach(item => {
+            if (filter === 'all' || item.classList.contains(filter)) {
+              item.classList.remove('hidden');
+            } else {
+              item.classList.add('hidden');
+            }
+          });
+          // Ridimensiona la griglia dopo il filtraggio
+          resizeAllGridItems();
+        });
+      });
+    }
+    setupFilters();
+
+    window.addEventListener('resize', resizeAllGridItems);
   </script>
 
 </body>
