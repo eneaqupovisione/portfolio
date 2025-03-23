@@ -67,6 +67,19 @@
     .hidden {
       display: none;
     }
+    /* Overlay per le immagini "brushed" */
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 5px;
+      font-size: 14px;
+      text-align: center;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -90,7 +103,6 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Aggiungi o modifica gli array per ogni categoria secondo le tue preferenze.
     const bigPhotos = {
       brushed: ["057.jpg", "119.jpg"],
       lightPainting: [],
@@ -107,19 +119,53 @@
       Object.keys(data).forEach(category => {
         data[category].forEach(fileName => {
           const gridItem = document.createElement('div');
-          // Aggiunge le classi: "grid-item" e la categoria (per il filtro)
           gridItem.classList.add('grid-item', category);
+          
           // Se il file è definito come "big" per la categoria, aggiungi la classe "big"
           if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
             gridItem.classList.add('big');
           }
+          
           const img = document.createElement('img');
           // Costruisci il percorso: si assume che la cartella abbia lo stesso nome della categoria
           img.src = `${category}/${fileName}`;
           img.alt = fileName;
           gridItem.appendChild(img);
+          
+          // Se la categoria è "brushed", aggiungi la dinamica per mostrare la versione modificata
+          if (category === "brushed") {
+            // Imposta lo stato iniziale
+            gridItem.setAttribute("data-state", "original");
+            gridItem.setAttribute("data-original", img.src);
+            // Costruisci il percorso della versione modificata aggiungendo il suffisso _mod prima dell'estensione
+            let modifiedSrc = img.src.replace(/(\.[^.]+)$/, '_mod$1');
+            gridItem.setAttribute("data-modified", modifiedSrc);
+
+            // Crea l'overlay con l'istruzione
+            const overlay = document.createElement("div");
+            overlay.classList.add("overlay");
+            overlay.textContent = "Clicca per modificare";
+            gridItem.appendChild(overlay);
+
+            // Aggiungi un event listener per il click che alterna la versione dell'immagine
+            gridItem.addEventListener("click", function(e) {
+              // Impedisci che il click si propaghi ad altri elementi
+              e.stopPropagation();
+              let currentState = gridItem.getAttribute("data-state");
+              if (currentState === "original") {
+                img.src = gridItem.getAttribute("data-modified");
+                gridItem.setAttribute("data-state", "modified");
+                overlay.textContent = "Clicca per tornare";
+              } else {
+                img.src = gridItem.getAttribute("data-original");
+                gridItem.setAttribute("data-state", "original");
+                overlay.textContent = "Clicca per modificare";
+              }
+            });
+          }
+          
           grid.appendChild(gridItem);
-          // Dopo che l'immagine è stata caricata, ridimensiona l'elemento
+          // Dopo il caricamento dell'immagine, ridimensiona l'elemento
           img.addEventListener('load', () => {
             resizeGridItem(gridItem);
           });
@@ -127,7 +173,7 @@
       });
     }
 
-    // Calcola e imposta lo span delle righe per un grid-item, in base all'altezza dell'immagine
+    // Calcola e imposta lo span delle righe per un grid-item in base all'altezza dell'immagine
     function resizeGridItem(item) {
       const grid = document.getElementById('portfolio-grid');
       const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
@@ -137,7 +183,7 @@
       item.style.gridRowEnd = "span " + rowSpan;
     }
 
-    // Ridimensiona tutti gli elementi della griglia (utile al ridimensionamento della finestra o dopo il filtro)
+    // Ridimensiona tutti gli elementi della griglia (utile al resize della finestra o dopo il filtro)
     function resizeAllGridItems() {
       const allItems = document.querySelectorAll('.grid-item');
       allItems.forEach(item => resizeGridItem(item));
@@ -148,12 +194,12 @@
       .then(response => response.json())
       .then(data => {
         createGridItems(data);
-        // Dopo aver creato gli elementi, ridimensiona la griglia (ritardo per consentire il caricamento delle immagini)
+        // Dopo il caricamento, ridimensiona tutti gli elementi (ritardo per consentire il caricamento delle immagini)
         setTimeout(resizeAllGridItems, 500);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
 
-    // Funzionalità di filtro: ogni volta che si clicca, re-query delle grid-item per avere tutti gli elementi aggiornati
+    // Imposta la funzionalità di filtro
     const navLinks = document.querySelectorAll('.portfolio-nav a');
     navLinks.forEach(link => {
       link.addEventListener('click', function(e) {
@@ -162,7 +208,7 @@
         // Aggiorna lo stato "active" nel menu
         navLinks.forEach(l => l.classList.remove('active'));
         this.classList.add('active');
-        // Re-query delle grid-item per ottenere l'elenco aggiornato
+        // Re-query degli elementi della griglia
         const gridItems = document.querySelectorAll('.grid-item');
         gridItems.forEach(item => {
           if (filter === 'all' || item.classList.contains(filter)) {
@@ -176,7 +222,7 @@
       });
     });
 
-    // Aggiorna la griglia al ridimensionamento della finestra
+    // Ridimensiona la griglia al ridimensionamento della finestra
     window.addEventListener('resize', resizeAllGridItems);
   </script>
 
