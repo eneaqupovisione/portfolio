@@ -54,13 +54,19 @@
       height: auto;
       display: block;
     }
-    /* Le immagini "big" occupano 2 colonne */
+    /* Le immagini "big" occupano più colonne (modifica questo valore per regolare le dimensioni) */
     .grid-item.big {
-      grid-column: span 2;
+      grid-column: span 1.4;
     }
-    /* Effetto hover marcato: zoom forte e box-shadow */
+    .grid-item.extra-big {
+      grid-column: span 2.1;
+    }
+    .grid-item.mega-big {
+      grid-column: span 3;
+    }
+    /* Effetto hover marcato: zoom e box-shadow */
     .grid-item:hover {
-      transform: scale(1.5);
+      transform: scale(1.3);
       z-index: 10;
       box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
@@ -104,9 +110,9 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Per le categorie diverse da "brushed", usa questo oggetto; per "brushed" forziamo tutti a essere grandi.
+    // Per "brushed" non forziamo la classe "big", in modo che seguano il loro ordine naturale.
     const bigPhotos = {
-      brushed: [], // Non usato: per "brushed" forziamo sempre la classe "big"
+      brushed: [], // Non forzato, seguono l'ordine numerico
       lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
       mezzoBustoPrimoPiano: [],
@@ -127,20 +133,18 @@
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
-        // Ordina numericamente i file (estrazione del numero dal nome, es. "057.jpg")
+        // Ordina numericamente i file (es. "057.jpg" -> 57)
         data[category].sort((a, b) => parseInt(a) - parseInt(b));
         data[category].forEach(fileName => {
-          // Per "brushed": mostra solo le immagini originali (quelle che sono chiavi nella mappatura)
+          // Per "brushed": mostra solo i file originali (quelle che sono chiavi nella mappatura)
           if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
             return; // Salta i file che sono destinazioni
           }
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
           
-          // Per la categoria "brushed", forziamo la visualizzazione "big" per tutti gli elementi
-          if (category === "brushed") {
-            gridItem.classList.add('big');
-          } else if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
+          // Applica la classe "big" solo se definita in bigPhotos per categorie diverse da "brushed"
+          if (bigPhotos[category] && bigPhotos[category].includes(fileName)) {
             gridItem.classList.add('big');
           }
           
@@ -150,7 +154,7 @@
           img.alt = fileName;
           gridItem.appendChild(img);
           
-          // Se la categoria è "brushed", aggiungi la dinamica per mostrare la versione modificata
+          // Se la categoria è "brushed", aggiungi la dinamica per alternare la versione modificata
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
@@ -164,7 +168,7 @@
             overlay.textContent = "Clicca per modificare";
             gridItem.appendChild(overlay);
 
-            // Aggiungi un event listener per alternare la versione dell'immagine al click
+            // Alterna la versione dell'immagine al click
             gridItem.addEventListener("click", function(e) {
               e.stopPropagation();
               let currentState = gridItem.getAttribute("data-state");
