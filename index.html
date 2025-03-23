@@ -54,7 +54,7 @@
       height: auto;
       display: block;
     }
-    /* Le immagini "big", "extra-big" o "mega-big" regolano quante colonne occupano */
+    /* Le immagini "big", "extra-big" e "mega-big" regolano quante colonne occupano */
     .grid-item.big {
       grid-column: span 1.4;
     }
@@ -110,7 +110,7 @@
 
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
-    // Per "brushed" non forziamo la classe "big" così da mantenere l'ordine naturale.
+    // Per "brushed" non forziamo la classe "big", in modo che seguano l'ordine naturale.
     const bigPhotos = {
       brushed: [],
       lightPainting: [],
@@ -133,7 +133,7 @@
     function createGridItems(data) {
       const grid = document.getElementById('portfolio-grid');
       Object.keys(data).forEach(category => {
-        // Ordina numericamente i file in ogni categoria (es. "057.jpg" -> 57)
+        // Ordina numericamente i file in ogni categoria
         data[category].sort((a, b) => parseInt(a) - parseInt(b));
         data[category].forEach(fileName => {
           // Per "brushed": mostra solo i file originali (quelle che sono chiavi nel mapping)
@@ -182,7 +182,6 @@
           }
           
           grid.appendChild(gridItem);
-          // Dopo il caricamento dell'immagine, ridimensiona l'elemento
           img.addEventListener('load', () => {
             resizeGridItem(gridItem);
           });
@@ -215,7 +214,7 @@
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
 
-    // Imposta la funzionalità di filtro
+    // Funzionalità di filtro
     const navLinks = document.querySelectorAll('.portfolio-nav a');
     navLinks.forEach(link => {
       link.addEventListener('click', function(e) {
@@ -231,16 +230,21 @@
             item.classList.add('hidden');
           }
         });
-        // Se si seleziona "Tutte", ordina globalmente i grid-item per nome (numerico)
-        if(filter === 'all'){
+        // Se il filtro "Tutte" è selezionato, forza l'ordinamento per nome numerico
+        if (filter === 'all') {
           const gridContainer = document.getElementById('portfolio-grid');
           const itemsArray = Array.from(gridContainer.querySelectorAll('.grid-item'));
+          // Genera l'array di ordine desiderato da "001" a "130"
+          const desiredOrder = [];
+          for (let i = 1; i <= 130; i++) {
+            desiredOrder.push(String(i).padStart(3, "0"));
+          }
           itemsArray.sort((a, b) => {
             const aName = a.querySelector('img').alt;
             const bName = b.querySelector('img').alt;
-            return parseInt(aName) - parseInt(bName);
+            return desiredOrder.indexOf(aName) - desiredOrder.indexOf(bName);
           });
-          itemsArray.forEach(item => gridContainer.removeChild(item));
+          // Riordina gli elementi nel container
           itemsArray.forEach(item => gridContainer.appendChild(item));
         }
         resizeAllGridItems();
