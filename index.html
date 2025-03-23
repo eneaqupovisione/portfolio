@@ -2,729 +2,142 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Enea</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+  <title>Portfolio Mosaico Gratuito</title>
   <style>
-    /* Reset di base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #111;
-      color: #fff;
-      user-select: none; /* Disabilita la selezione del testo */
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #fafafa;
     }
-    header {
-      text-align: center;
-      padding: 20px;
-      background: #222;
-      border-bottom: 2px solid #444;
+    /* Menu di navigazione */
+    .portfolio-nav {
+      padding: 1rem;
+      background-color: #f4f4f4;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    header h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
+    .portfolio-nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 1rem;
+      margin: 0;
     }
-    header p {
-      font-size: 1.2em;
+    .portfolio-nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s;
     }
-    .gallery {
+    .portfolio-nav a.active,
+    .portfolio-nav a:hover {
+      color: #007BFF;
+    }
+    /* Contenitore della griglia */
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-      padding: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-auto-rows: 10px;  /* Altezza di base per riga, verrà usato in combinazione con il dense layout */
+      grid-auto-flow: dense;
+      gap: 10px;
+      padding: 1rem;
     }
-    .gallery-item {
+    /* Elementi della griglia */
+    .grid-item {
       position: relative;
       overflow: hidden;
-      cursor: default;
-      border: 4px solid #fff;
-      border-radius: 8px;
-      transition: transform 0.4s ease, border-color 0.4s ease;
+      transition: transform 0.3s ease;
     }
-    .gallery-item:hover {
-      transform: scale(1.03);
-      border-color: #ff6f61;
-    }
-    .gallery-item img {
+    /* Immagini che si adattano al contenitore */
+    .grid-item img {
       width: 100%;
+      height: auto;
       display: block;
-      transition: transform 0.4s ease;
     }
-    .gallery-item:hover img {
-      transform: scale(1.1);
+    /* Effetto hover: ingrandimento */
+    .grid-item:hover {
+      transform: scale(1.05);
+      z-index: 2;
+    }
+    /* Elementi "big" che occupano più spazio */
+    .grid-item.big {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    /* Classe per nascondere gli elementi filtrati */
+    .hidden {
+      display: none;
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
-  <header>
-    <h1>Enea</h1>
-    <p>Contatti: eneapesaresi11@gmail.com</p>
-  </header>
-  
-  <div class="gallery">
-    <!-- Galleria con immagini da 1.jpg a 130.jpg -->
-    <div class="gallery-item">
-      <a href="images/1.jpg" data-lightbox="portfolio">
-        <img src="images/1.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/2.jpg" data-lightbox="portfolio">
-        <img src="images/2.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/3.jpg" data-lightbox="portfolio">
-        <img src="images/3.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/4.jpg" data-lightbox="portfolio">
-        <img src="images/4.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/5.jpg" data-lightbox="portfolio">
-        <img src="images/5.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/6.jpg" data-lightbox="portfolio">
-        <img src="images/6.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/7.jpg" data-lightbox="portfolio">
-        <img src="images/7.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/8.jpg" data-lightbox="portfolio">
-        <img src="images/8.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/9.jpg" data-lightbox="portfolio">
-        <img src="images/9.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/10.jpg" data-lightbox="portfolio">
-        <img src="images/10.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/11.jpg" data-lightbox="portfolio">
-        <img src="images/11.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/12.jpg" data-lightbox="portfolio">
-        <img src="images/12.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/13.jpg" data-lightbox="portfolio">
-        <img src="images/13.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/14.jpg" data-lightbox="portfolio">
-        <img src="images/14.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/15.jpg" data-lightbox="portfolio">
-        <img src="images/15.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/16.jpg" data-lightbox="portfolio">
-        <img src="images/16.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/17.jpg" data-lightbox="portfolio">
-        <img src="images/17.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/18.jpg" data-lightbox="portfolio">
-        <img src="images/18.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/19.jpg" data-lightbox="portfolio">
-        <img src="images/19.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/20.jpg" data-lightbox="portfolio">
-        <img src="images/20.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/21.jpg" data-lightbox="portfolio">
-        <img src="images/21.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/22.jpg" data-lightbox="portfolio">
-        <img src="images/22.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/23.jpg" data-lightbox="portfolio">
-        <img src="images/23.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/24.jpg" data-lightbox="portfolio">
-        <img src="images/24.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/25.jpg" data-lightbox="portfolio">
-        <img src="images/25.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/26.jpg" data-lightbox="portfolio">
-        <img src="images/26.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/27.jpg" data-lightbox="portfolio">
-        <img src="images/27.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/28.jpg" data-lightbox="portfolio">
-        <img src="images/28.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/29.jpg" data-lightbox="portfolio">
-        <img src="images/29.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/30.jpg" data-lightbox="portfolio">
-        <img src="images/30.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/31.jpg" data-lightbox="portfolio">
-        <img src="images/31.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/32.jpg" data-lightbox="portfolio">
-        <img src="images/32.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/33.jpg" data-lightbox="portfolio">
-        <img src="images/33.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/34.jpg" data-lightbox="portfolio">
-        <img src="images/34.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/35.jpg" data-lightbox="portfolio">
-        <img src="images/35.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/36.jpg" data-lightbox="portfolio">
-        <img src="images/36.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/37.jpg" data-lightbox="portfolio">
-        <img src="images/37.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/38.jpg" data-lightbox="portfolio">
-        <img src="images/38.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/39.jpg" data-lightbox="portfolio">
-        <img src="images/39.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/40.jpg" data-lightbox="portfolio">
-        <img src="images/40.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/41.jpg" data-lightbox="portfolio">
-        <img src="images/41.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/42.jpg" data-lightbox="portfolio">
-        <img src="images/42.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/43.jpg" data-lightbox="portfolio">
-        <img src="images/43.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/44.jpg" data-lightbox="portfolio">
-        <img src="images/44.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/45.jpg" data-lightbox="portfolio">
-        <img src="images/45.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/46.jpg" data-lightbox="portfolio">
-        <img src="images/46.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/47.jpg" data-lightbox="portfolio">
-        <img src="images/47.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/48.jpg" data-lightbox="portfolio">
-        <img src="images/48.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/49.jpg" data-lightbox="portfolio">
-        <img src="images/49.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/50.jpg" data-lightbox="portfolio">
-        <img src="images/50.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/51.jpg" data-lightbox="portfolio">
-        <img src="images/51.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/52.jpg" data-lightbox="portfolio">
-        <img src="images/52.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/53.jpg" data-lightbox="portfolio">
-        <img src="images/53.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/54.jpg" data-lightbox="portfolio">
-        <img src="images/54.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/55.jpg" data-lightbox="portfolio">
-        <img src="images/55.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/56.jpg" data-lightbox="portfolio">
-        <img src="images/56.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/57.jpg" data-lightbox="portfolio">
-        <img src="images/57.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/58.jpg" data-lightbox="portfolio">
-        <img src="images/58.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/59.jpg" data-lightbox="portfolio">
-        <img src="images/59.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/60.jpg" data-lightbox="portfolio">
-        <img src="images/60.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/61.jpg" data-lightbox="portfolio">
-        <img src="images/61.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/62.jpg" data-lightbox="portfolio">
-        <img src="images/62.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/63.jpg" data-lightbox="portfolio">
-        <img src="images/63.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/64.jpg" data-lightbox="portfolio">
-        <img src="images/64.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/65.jpg" data-lightbox="portfolio">
-        <img src="images/65.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/66.jpg" data-lightbox="portfolio">
-        <img src="images/66.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/67.jpg" data-lightbox="portfolio">
-        <img src="images/67.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/68.jpg" data-lightbox="portfolio">
-        <img src="images/68.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/69.jpg" data-lightbox="portfolio">
-        <img src="images/69.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/70.jpg" data-lightbox="portfolio">
-        <img src="images/70.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/71.jpg" data-lightbox="portfolio">
-        <img src="images/71.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/72.jpg" data-lightbox="portfolio">
-        <img src="images/72.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/73.jpg" data-lightbox="portfolio">
-        <img src="images/73.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/74.jpg" data-lightbox="portfolio">
-        <img src="images/74.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/75.jpg" data-lightbox="portfolio">
-        <img src="images/75.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/76.jpg" data-lightbox="portfolio">
-        <img src="images/76.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/77.jpg" data-lightbox="portfolio">
-        <img src="images/77.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/78.jpg" data-lightbox="portfolio">
-        <img src="images/78.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/79.jpg" data-lightbox="portfolio">
-        <img src="images/79.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/80.jpg" data-lightbox="portfolio">
-        <img src="images/80.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/81.jpg" data-lightbox="portfolio">
-        <img src="images/81.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/82.jpg" data-lightbox="portfolio">
-        <img src="images/82.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/83.jpg" data-lightbox="portfolio">
-        <img src="images/83.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/84.jpg" data-lightbox="portfolio">
-        <img src="images/84.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/85.jpg" data-lightbox="portfolio">
-        <img src="images/85.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/86.jpg" data-lightbox="portfolio">
-        <img src="images/86.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/87.jpg" data-lightbox="portfolio">
-        <img src="images/87.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/88.jpg" data-lightbox="portfolio">
-        <img src="images/88.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/89.jpg" data-lightbox="portfolio">
-        <img src="images/89.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/90.jpg" data-lightbox="portfolio">
-        <img src="images/90.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/91.jpg" data-lightbox="portfolio">
-        <img src="images/91.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/92.jpg" data-lightbox="portfolio">
-        <img src="images/92.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/93.jpg" data-lightbox="portfolio">
-        <img src="images/93.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/94.jpg" data-lightbox="portfolio">
-        <img src="images/94.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/95.jpg" data-lightbox="portfolio">
-        <img src="images/95.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/96.jpg" data-lightbox="portfolio">
-        <img src="images/96.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/97.jpg" data-lightbox="portfolio">
-        <img src="images/97.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/98.jpg" data-lightbox="portfolio">
-        <img src="images/98.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/99.jpg" data-lightbox="portfolio">
-        <img src="images/99.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/100.jpg" data-lightbox="portfolio">
-        <img src="images/100.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/101.jpg" data-lightbox="portfolio">
-        <img src="images/101.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/102.jpg" data-lightbox="portfolio">
-        <img src="images/102.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/103.jpg" data-lightbox="portfolio">
-        <img src="images/103.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/104.jpg" data-lightbox="portfolio">
-        <img src="images/104.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/105.jpg" data-lightbox="portfolio">
-        <img src="images/105.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/106.jpg" data-lightbox="portfolio">
-        <img src="images/106.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/107.jpg" data-lightbox="portfolio">
-        <img src="images/107.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/108.jpg" data-lightbox="portfolio">
-        <img src="images/108.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/109.jpg" data-lightbox="portfolio">
-        <img src="images/109.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/110.jpg" data-lightbox="portfolio">
-        <img src="images/110.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/111.jpg" data-lightbox="portfolio">
-        <img src="images/111.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/112.jpg" data-lightbox="portfolio">
-        <img src="images/112.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/113.jpg" data-lightbox="portfolio">
-        <img src="images/113.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/114.jpg" data-lightbox="portfolio">
-        <img src="images/114.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/115.jpg" data-lightbox="portfolio">
-        <img src="images/115.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/116.jpg" data-lightbox="portfolio">
-        <img src="images/116.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/117.jpg" data-lightbox="portfolio">
-        <img src="images/117.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/118.jpg" data-lightbox="portfolio">
-        <img src="images/118.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/119.jpg" data-lightbox="portfolio">
-        <img src="images/119.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/120.jpg" data-lightbox="portfolio">
-        <img src="images/120.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/121.jpg" data-lightbox="portfolio">
-        <img src="images/121.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/122.jpg" data-lightbox="portfolio">
-        <img src="images/122.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/123.jpg" data-lightbox="portfolio">
-        <img src="images/123.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/124.jpg" data-lightbox="portfolio">
-        <img src="images/124.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/125.jpg" data-lightbox="portfolio">
-        <img src="images/125.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/126.jpg" data-lightbox="portfolio">
-        <img src="images/126.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/127.jpg" data-lightbox="portfolio">
-        <img src="images/127.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/128.jpg" data-lightbox="portfolio">
-        <img src="images/128.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/129.jpg" data-lightbox="portfolio">
-        <img src="images/129.jpg" alt="">
-      </a>
-    </div>
-    <div class="gallery-item">
-      <a href="images/130.jpg" data-lightbox="portfolio">
-        <img src="images/130.jpg" alt="">
-      </a>
-    </div>
+<body>
+
+  <!-- Menu di navigazione (puoi posizionarlo anche a lato se preferisci) -->
+  <nav class="portfolio-nav">
+    <ul>
+      <li><a href="#" data-filter="all" class="active">Tutte</a></li>
+      <li><a href="#" data-filter="best">Best Pictures</a></li>
+      <li><a href="#" data-filter="landscape">Landscape</a></li>
+      <li><a href="#" data-filter="portrait">Portrait</a></li>
+      <!-- Aggiungi altre categorie se necessario -->
+    </ul>
+  </nav>
+
+  <!-- Griglia delle immagini -->
+  <div class="grid" id="portfolio-grid">
+    <!-- Esempi di immagini: assegna le classi per filtrare e per le dimensioni -->
+    <div class="grid-item best big">
+      <img src="img/001.jpg" alt="Foto 1">
+    </div>
+    <div class="grid-item best">
+      <img src="img/002.jpg" alt="Foto 2">
+    </div>
+    <div class="grid-item landscape big">
+      <img src="img/003.jpg" alt="Foto 3">
+    </div>
+    <div class="grid-item portrait">
+      <img src="img/004.jpg" alt="Foto 4">
+    </div>
+    <div class="grid-item best">
+      <img src="img/005.jpg" alt="Foto 5">
+    </div>
+    <div class="grid-item landscape">
+      <img src="img/006.jpg" alt="Foto 6">
+    </div>
+    <!-- Aggiungi qui tutte le altre immagini, assegnando le classi corrispondenti -->
   </div>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+  <!-- Script JavaScript per il filtro -->
   <script>
-    // Disabilita il click destro
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
+    // Seleziona i link del menu e gli elementi della griglia
+    const navLinks = document.querySelectorAll('.portfolio-nav a');
+    const gridItems = document.querySelectorAll('.grid-item');
+
+    // Aggiunge un listener per ogni link di filtro
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const filter = this.getAttribute('data-filter');
+
+        // Aggiorna lo stato "active" del menu
+        navLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+
+        // Mostra/nascondi gli elementi in base al filtro
+        gridItems.forEach(item => {
+          if (filter === 'all') {
+            item.classList.remove('hidden');
+          } else {
+            if (item.classList.contains(filter)) {
+              item.classList.remove('hidden');
+            } else {
+              item.classList.add('hidden');
+            }
+          }
+        });
+      });
     });
   </script>
+
 </body>
 </html>
