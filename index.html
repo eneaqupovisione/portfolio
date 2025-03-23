@@ -104,7 +104,7 @@
   <script>
     // Oggetto per definire quali immagini devono essere "big" per ogni categoria.
     const bigPhotos = {
-      brushed: ["057.jpg", "119.jpg"],
+      brushed: ["057.jpg", "119.jpg"], // Eventuali immagini da visualizzare in grande
       lightPainting: [],
       longExposurePortraits: ["005.jpg", "015.jpg"],
       mezzoBustoPrimoPiano: [],
@@ -114,14 +114,11 @@
     };
 
     // Mappatura personalizzata per la categoria "brushed"
-    // Sostituisci le coppie con i nomi effettivi: 'nome_originale': 'nome_modificato'
+    // Le chiavi sono i nomi delle immagini originali, i valori sono le destinazioni modificate.
     const customBrushedMapping = {
-      const customBrushedMapping = {
-          "068.jpg": "057.jpg",
-          "127.jpg": "119.jpg",
-          "115.jpg": "128.jpg"
-};
-      // Aggiungi altre coppie se necessario
+      "068.jpg": "057.jpg",
+      "127.jpg": "119.jpg",
+      "115.jpg": "128.jpg"
     };
 
     // Funzione che crea gli elementi della griglia basandosi sui dati JSON
@@ -147,7 +144,7 @@
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
-            // Usa la mappatura personalizzata se presente, altrimenti, potresti decidere un fallback
+            // Se esiste una mappatura personalizzata per questo file, usa il percorso modificato
             let modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
             
