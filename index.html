@@ -9,15 +9,12 @@
       margin: 0;
       font-family: sans-serif;
       background-color: #fafafa;
-      overflow-x: hidden;
     }
     /* Menu di navigazione */
     .portfolio-nav {
       padding: 1rem;
       background-color: #f4f4f4;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 100;
     }
     .portfolio-nav ul {
       list-style: none;
@@ -37,30 +34,27 @@
     .portfolio-nav a:hover {
       color: #007BFF;
     }
-
     /* Contenitore della griglia */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      grid-auto-rows: 10px;
+      grid-auto-rows: 10px; /* Base per il calcolo dello span */
       gap: 10px;
       padding: 1rem;
     }
-
+    /* Elementi della griglia */
     .grid-item {
       position: relative;
       overflow: hidden;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      transform-origin: center center;
-      cursor: pointer;
+      transform-origin: center center; /* Zoom dal centro */
     }
-
     .grid-item img {
       width: 100%;
       height: auto;
       display: block;
     }
-
+    /* Le immagini "big", "extra-big" e "mega-big" regolano quante colonne occupano */
     .grid-item.big {
       grid-column: span 1.4;
     }
@@ -70,20 +64,17 @@
     .grid-item.mega-big {
       grid-column: span 3;
     }
-
-    /* Hover effetto */
+    /* Effetto hover marcato: zoom e box-shadow */
     .grid-item:hover {
       transform: scale(1.3);
       z-index: 10;
       box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
-
-    /* Nascondi elementi filtrati */
+    /* Classe per nascondere gli elementi per il filtro */
     .hidden {
       display: none;
     }
-
-    /* Overlay per immagini brushed */
+    /* Overlay per le immagini "brushed" */
     .overlay {
       position: absolute;
       bottom: 0;
@@ -94,43 +85,13 @@
       padding: 5px;
       font-size: 14px;
       text-align: center;
-      pointer-events: none;
       opacity: 0.8;
     }
-
-    /* Sfondo opaco fullscreen */
-    .fullscreen-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 99;
-      display: none;
-    }
-
-    /* Stile immagine ingrandita */
-    .fullscreen {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) scale(1.8) !important;
-      z-index: 1000 !important;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-
-    .fullscreen img {
-      max-height: 80vh;
-      width: auto;
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- Sfondo opaco per fullscreen -->
-  <div class="fullscreen-backdrop" id="fullscreen-backdrop"></div>
-
-  <!-- Menu -->
+  <!-- Menu di navigazione per il filtro -->
   <nav class="portfolio-nav">
     <ul>
       <li><a href="#" data-filter="all" class="active">Tutte</a></li>
@@ -144,10 +105,11 @@
     </ul>
   </nav>
 
-  <!-- Galleria -->
+  <!-- Contenitore della griglia -->
   <div class="grid" id="portfolio-grid"></div>
 
   <script>
+    // Definizione degli elementi "big" per ogni categoria
     const bigPhotos = {
       brushed: [],
       lightPainting: [],
@@ -158,40 +120,90 @@
       trip: []
     };
 
+    // Mappatura personalizzata per la categoria "brushed"
+    // (file originale -> file modificato)
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
       "127.jpg": "128.jpg",
       "113.jpg": "119.jpg"
     };
 
-    function createGridItems(data) {
+    // Calcola e imposta lo span delle righe per un grid-item
+    function resizeGridItem(item) {
       const grid = document.getElementById('portfolio-grid');
-      Object.keys(data).forEach(category => {
-        data[category].sort((a, b) => parseInt(a) - parseInt(b));
-        data[category].forEach(fileName => {
-          if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) return;
+      const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+      const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
+      const contentHeight = item.querySelector('img').getBoundingClientRect().height;
+      const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
+      item.style.gridRowEnd = "span " + rowSpan;
+    }
+
+    // Ridimensiona tutti gli elementi della griglia
+    function resizeAllGridItems() {
+      const allItems = document.querySelectorAll('.grid-item');
+      allItems.forEach(item => resizeGridItem(item));
+    }
+
+    // Carica il file JSON e crea la galleria
+    fetch('images.json')
+      .then(response => response.json())
+      .then(data => {
+        // 1) Raccogliamo tutte le immagini in un unico array "allImages"
+        const allImages = [];
+
+        Object.entries(data).forEach(([category, files]) => {
+          files.forEach(fileName => {
+            // Se la categoria è "brushed" e questo fileName è una DESTINAZIONE nel mapping
+            // (es: "057.jpg" che deriva da "068.jpg"), lo saltiamo per evitare doppioni.
+            if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
+              return;
+            }
+            // Aggiungiamo tutte le altre immagini
+            allImages.push({ fileName, category });
+          });
+        });
+
+        // 2) Ordiniamo numericamente i file (es. "001.jpg" -> 1, "068.jpg" -> 68)
+        allImages.sort((a, b) => {
+          const numA = parseInt(a.fileName.replace(/\D/g, ""), 10);
+          const numB = parseInt(b.fileName.replace(/\D/g, ""), 10);
+          return numA - numB;
+        });
+
+        // 3) Creiamo gli elementi della griglia nell'ordine numerico
+        const grid = document.getElementById('portfolio-grid');
+        allImages.forEach(({ fileName, category }) => {
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', category);
+
+          // Se definito in bigPhotos, aggiungi la classe "big"
           if (category !== "brushed" && bigPhotos[category]?.includes(fileName)) {
             gridItem.classList.add('big');
           }
+
           const img = document.createElement('img');
           img.src = `${category}/${fileName}`;
           img.alt = fileName;
           gridItem.appendChild(img);
+
+          // Se è "brushed", aggiungi la funzionalità di alternare la versione modificata
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
-            let modifiedSrc = customBrushedMapping[fileName] ? `${category}/${customBrushedMapping[fileName]}` : img.src;
+
+            const modifiedSrc = customBrushedMapping[fileName]
+              ? `${category}/${customBrushedMapping[fileName]}`
+              : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
+
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
             overlay.textContent = "Clicca per modificare";
             gridItem.appendChild(overlay);
+
             gridItem.addEventListener("click", function(e) {
-              if (gridItem.classList.contains("fullscreen")) return;
               e.stopPropagation();
-              let currentState = gridItem.getAttribute("data-state");
+              const currentState = gridItem.getAttribute("data-state");
               if (currentState === "original") {
                 img.src = gridItem.getAttribute("data-modified");
                 gridItem.setAttribute("data-state", "modified");
@@ -204,96 +216,55 @@
             });
           }
 
-          gridItem.addEventListener("click", function(e) {
-            // Ignora click se è "brushed" e già gestito
-            if (category === "brushed" && e.target.classList.contains("overlay")) return;
-            const fullscreenItem = document.querySelector('.grid-item.fullscreen');
-            const backdrop = document.getElementById('fullscreen-backdrop');
-            if (gridItem.classList.contains("fullscreen")) {
-              gridItem.classList.remove("fullscreen");
-              backdrop.style.display = "none";
-            } else {
-              if (fullscreenItem) fullscreenItem.classList.remove("fullscreen");
-              gridItem.classList.add("fullscreen");
-              backdrop.style.display = "block";
-            }
-          });
-
           grid.appendChild(gridItem);
           img.addEventListener("load", () => resizeGridItem(gridItem));
         });
-      });
-    }
 
-    function resizeGridItem(item) {
-      const grid = document.getElementById('portfolio-grid');
-      const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
-      const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
-      const contentHeight = item.querySelector('img').getBoundingClientRect().height;
-      const rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
-      item.style.gridRowEnd = "span " + rowSpan;
-    }
+        // Al termine, ridimensioniamo la griglia
+        setTimeout(resizeAllGridItems, 500);
 
-    function resizeAllGridItems() {
-      document.querySelectorAll('.grid-item').forEach(item => resizeGridItem(item));
-    }
+        // 4) Funzionalità di filtro (cliccando su "Tutte", "Brushed", ecc.)
+        const navLinks = document.querySelectorAll('.portfolio-nav a');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filter = link.getAttribute('data-filter');
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
 
-    fetch('images.json')
-      .then(response => response.json())
-      .then(data => {
-        const allImages = [];
-        Object.entries(data).forEach(([category, files]) => {
-          files.forEach(fileName => {
-            if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) return;
-            allImages.push({ fileName, category });
+            // Se clicchiamo su "Tutte", mostriamo tutto e riapplichiamo l'ordinamento numerico
+            const gridItems = document.querySelectorAll('.grid-item');
+            if (filter === 'all') {
+              gridItems.forEach(item => item.classList.remove('hidden'));
+              // Riordina i nodi del DOM in base al numero nel nome file
+              const itemsArray = Array.from(gridItems);
+              itemsArray.sort((a, b) => {
+                const aNum = parseInt(a.querySelector('img').alt.replace(/\D/g, ""), 10);
+                const bNum = parseInt(b.querySelector('img').alt.replace(/\D/g, ""), 10);
+                return aNum - bNum;
+              });
+              itemsArray.forEach(item => grid.appendChild(item));
+            } else {
+              // Mostra solo la categoria selezionata
+              gridItems.forEach(item => {
+                if (item.classList.contains(filter)) {
+                  item.classList.remove('hidden');
+                } else {
+                  item.classList.add('hidden');
+                }
+              });
+            }
+            resizeAllGridItems();
           });
         });
-        allImages.sort((a, b) => parseInt(a.fileName) - parseInt(b.fileName));
-        const grid = document.getElementById('portfolio-grid');
-        allImages.forEach(({ fileName, category }) => {
-          // (identico a sopra) – può essere unificato
-        });
-        createGridItems(data);
-        setTimeout(resizeAllGridItems, 500);
+
+        // Ridimensiona la griglia anche al resize della finestra
+        window.addEventListener('resize', resizeAllGridItems);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
-
-    const navLinks = document.querySelectorAll('.portfolio-nav a');
-    navLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const filter = this.getAttribute('data-filter');
-        navLinks.forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-        const gridItems = document.querySelectorAll('.grid-item');
-        if (filter === 'all') {
-          gridItems.forEach(item => item.classList.remove('hidden'));
-          const gridContainer = document.getElementById('portfolio-grid');
-          const itemsArray = Array.from(gridItems);
-          itemsArray.sort((a, b) => {
-            const aNum = parseInt(a.querySelector('img').alt, 10);
-            const bNum = parseInt(b.querySelector('img').alt, 10);
-            return aNum - bNum;
-          });
-          itemsArray.forEach(item => gridContainer.appendChild(item));
-        } else {
-          gridItems.forEach(item => {
-            item.classList.toggle('hidden', !item.classList.contains(filter));
-          });
-        }
-        resizeAllGridItems();
-      });
-    });
-
-    window.addEventListener('resize', resizeAllGridItems);
-
-    // Clic sul backdrop per chiudere
-    document.getElementById("fullscreen-backdrop").addEventListener("click", () => {
-      const active = document.querySelector(".grid-item.fullscreen");
-      if (active) active.classList.remove("fullscreen");
-      document.getElementById("fullscreen-backdrop").style.display = "none";
-    });
   </script>
 
 </body>
 </html>
+
+
