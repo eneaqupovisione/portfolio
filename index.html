@@ -91,7 +91,7 @@
       text-align: center;
       opacity: 0.8;
     }
-    /* Stili per l'effetto click: immagine in primo piano a dimensione standard */
+    /* Stili per l'effetto click: immagine in primo piano con layout automatico */
     .grid-item.enlarged {
       position: fixed;
       top: 50%;
@@ -100,16 +100,20 @@
       z-index: 1000;
       box-shadow: 0 12px 24px rgba(0,0,0,0.5);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      /* Dimensione standard: la finestra dell'immagine sarà sempre 80vw, ma non supererà 90vw/90vh */
-      width: 80vw;
+      /* L'immagine non avrà una larghezza fissa, ma verrà ridimensionata automaticamente
+         fino a un massimo di 90vw/90vh */
       max-width: 90vw;
       max-height: 90vh;
+      background: #fff;
+      padding: 10px;
     }
     .grid-item.enlarged img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
       display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -177,8 +181,7 @@
 
         Object.entries(data).forEach(([category, files]) => {
           files.forEach(fileName => {
-            // Se la categoria è "brushed" e questo fileName è una DESTINAZIONE nel mapping,
-            // lo saltiamo per evitare doppioni.
+            // Se la categoria è "brushed" e questo fileName è una DESTINAZIONE nel mapping, salta per evitare duplicati.
             if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
               return;
             }
