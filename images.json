@@ -1,13 +1,5 @@
 {
-  "brushed": [
-    "057.jpg",
-    "068.jpg",
-    "113.jpg",
-    "119.jpg",
-    "127.jpg",
-    "128.jpg"
-  ],
-  "lightPainting": [
+  "abstracts": [
     "002.jpg",
     "021.jpg",
     "047.jpg",
@@ -16,7 +8,63 @@
     "104.jpg",
     "121.jpg"
   ],
-  "longExposurePortraits": [
+  "brushed": [
+    "057.jpg",
+    "068.jpg",
+    "113.jpg",
+    "119.jpg",
+    "127.jpg",
+    "128.jpg"
+  ],
+  "closeup": [
+    "006.jpg",
+    "008.jpg",
+    "009a.jpg",
+    "010.jpg",
+    "011.jpg",
+    "012.jpg",
+    "013.jpg",
+    "014.jpg",
+    "015.jpg",
+    "019.jpg",
+    "020.jpg",
+    "025.jpg",
+    "027.jpg",
+    "045.jpg",
+    "046.jpg",
+    "050.jpg",
+    "052.jpg",
+    "053.jpg",
+    "054.jpg",
+    "060.jpg",
+    "073.jpg",
+    "074.jpg",
+    "077.jpg",
+    "083.jpg",
+    "092.jpg",
+    "094.jpg",
+    "095.jpg",
+    "105.jpg",
+    "108.jpg"
+  ],
+  "conventional": [
+    "024.jpg",
+    "038.jpg",
+    "042.jpg",
+    "056.jpg",
+    "059.jpg",
+    "072.jpg",
+    "081.jpg",
+    "107.jpg",
+    "117.jpg",
+    "91.jpg"
+  ],
+  "justobjects": [
+    "018.jpg",
+    "070.jpg",
+    "118.jpg"
+  ],
+  "longexposureportraits": [
     "004.jpg",
     "005.jpg",
     "028.jpg",
@@ -55,55 +103,7 @@
     "133.jpg",
     "134.jpg"
   ],
-  "mezzoBustoPrimoPiano": [
-    "006.jpg",
-    "008.jpg",
-    "009a.jpg",
-    "010.jpg",
-    "011.jpg",
-    "012.jpg",
-    "013.jpg",
-    "014.jpg",
-    "015.jpg",
-    "019.jpg",
-    "020.jpg",
-    "025.jpg",
-    "027.jpg",
-    "045.jpg",
-    "046.jpg",
-    "050.jpg",
-    "052.jpg",
-    "053.jpg",
-    "054.jpg",
-    "060.jpg",
-    "073.jpg",
-    "074.jpg",
-    "077.jpg",
-    "083.jpg",
-    "092.jpg",
-    "094.jpg",
-    "095.jpg",
-    "105.jpg",
-    "108.jpg"
-  ],
-  "moda": [
-    "024.jpg",
-    "038.jpg",
-    "042.jpg",
-    "056.jpg",
-    "059.jpg",
-    "072.jpg",
-    "081.jpg",
-    "107.jpg",
-    "117.jpg",
-    "91.jpg"
-  ],
-  "stillLife": [
-    "018.jpg",
-    "070.jpg",
-    "118.jpg"
-  ],
-  "trip": [
+  "sciencefiction": [
     "017.jpg",
     "023.jpg",
     "031.jpg",
