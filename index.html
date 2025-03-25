@@ -24,6 +24,10 @@
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
+      align-items: center;
+    }
+    .portfolio-nav li.contact {
+      margin-left: auto; /* Spinge la voce contatti a destra */
     }
     .portfolio-nav a {
       text-decoration: none;
@@ -65,25 +69,21 @@
     }
     /* Hover effect (applicato solo su dispositivi con hover) */
     @media (hover: hover) and (pointer: fine) {
-      /* Livello 1: "big" */
       .grid-item.big:hover {
         transform: scale(1.45);
         z-index: 10;
         box-shadow: 0 8px 16px rgba(0,0,0,0.4);
       }
-      /* Livello 2: "extra-big" */
       .grid-item.extra-big:hover {
         transform: scale(1.55);
         z-index: 10;
         box-shadow: 0 8px 16px rgba(0,0,0,0.4);
       }
-      /* Livello 3: "mega-big" */
       .grid-item.mega-big:hover {
         transform: scale(1.75);
         z-index: 10;
         box-shadow: 0 8px 16px rgba(0,0,0,0.4);
       }
-      /* Hover di default per le immagini senza classificazione speciale */
       .grid-item:not(.big):not(.extra-big):not(.mega-big):hover {
         transform: scale(1.38);
         z-index: 10;
@@ -136,7 +136,7 @@
       <li><a href="#" data-filter="conventional">Conventional</a></li>
       <li><a href="#" data-filter="justobjects">JustObjects</a></li>
       <li><a href="#" data-filter="sciencefiction">ScienceFiction</a></li>
-      <li><a href="#" data-filter="contact">Contatti</a></li>
+      <li class="contact"><a href="#" data-filter="contact">Contatti</a></li>
     </ul>
   </nav>
 
@@ -182,7 +182,7 @@
       
       // Nome d'arte e informazioni di contatto
       const artistName = document.createElement('h2');
-      artistName.textContent = "Nome d'arte: Il Mago della Luce"; // Modifica il nome come preferisci
+      artistName.textContent = "Nome d'arte: Il Mago della Luce";
       
       const emailInfo = document.createElement('p');
       emailInfo.innerHTML = 'Contattami via email: <a href="mailto:artist@example.com">artist@example.com</a>';
@@ -199,7 +199,6 @@
       
       // Chiude il modal al click fuori dal contenitore
       overlay.addEventListener('click', function(e) {
-        // Impedisci la chiusura se si clicca sul contenitore
         if(e.target === overlay){
           document.body.removeChild(overlay);
         }
@@ -222,18 +221,12 @@
       allItems.forEach(item => resizeGridItem(item));
     }
     
-    /* Definizione dei livelli:
-       - Level 3: immagini "mega-big"
-       - Level 2: immagini "extra-big"
-       - Level 1: immagini "big"
-       (Nota: "104" significa "104.jpg" e così via)
-    */
+    /* Definizione dei livelli per le immagini */
     const megaBigPhotos = ["104.jpg", "005.jpg", "013.jpg", "090.jpg", "103.jpg", "123.jpg", "125.jpg", "011.jpg", "082.jpg"];
     const extraBigPhotos = ["009.jpg", "012.jpg", "121.jpg", "014.jpg", "037.jpg", "087.jpg", "093.jpg", "098.jpg", "111.jpg", "114.jpg", "120.jpg", "036.jpg", "061.jpg", "069.jpg", "024.jpg", "023.jpg", "076.jpg"];
     const bigPhotos = ["029.jpg", "034.jpg", "040.jpg", "043.jpg", "100.jpg", "116.jpg", "124.jpg", "126.jpg", "046.jpg", "095.jpg", "038.jpg", "056.jpg"];
     
-    // Mappatura personalizzata per la categoria "brushed"
-    // (file originale -> file modificato)
+    // Mapping per "brushed"
     const customBrushedMapping = {
       "068.jpg": "057.jpg",
       "127.jpg": "128.jpg",
@@ -244,45 +237,32 @@
     fetch('images.json')
       .then(response => response.json())
       .then(data => {
-        // 1) Raccogli tutte le immagini in un unico array "allImages"
         const allImages = [];
         Object.entries(data).forEach(([category, files]) => {
           files.forEach(fileName => {
-            // Se la categoria è "brushed" e questo fileName è una DESTINAZIONE nel mapping, salta per evitare duplicati.
-            if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) {
-              return;
-            }
+            if (category === "brushed" && Object.values(customBrushedMapping).includes(fileName)) return;
             allImages.push({ fileName, category });
           });
         });
     
-        // 2) Ordina numericamente i file
         allImages.sort((a, b) => {
           const numA = parseInt(a.fileName.replace(/\D/g, ""), 10);
           const numB = parseInt(b.fileName.replace(/\D/g, ""), 10);
           return numA - numB;
         });
     
-        // 3) Crea gli elementi della griglia
         const grid = document.getElementById('portfolio-grid');
         allImages.forEach(({ fileName, category }) => {
-          // Salva il nome della cartella così com'è per il path
           const folder = category;
-          // Usa il lowercase per il filtro
           const filterClass = category.toLowerCase();
     
           const gridItem = document.createElement('div');
           gridItem.classList.add('grid-item', filterClass);
     
-          // Se la foto non appartiene a "brushed", applica la classe in base al livello
           if (category !== "brushed") {
-            if (megaBigPhotos.includes(fileName)) {
-              gridItem.classList.add('mega-big');
-            } else if (extraBigPhotos.includes(fileName)) {
-              gridItem.classList.add('extra-big');
-            } else if (bigPhotos.includes(fileName)) {
-              gridItem.classList.add('big');
-            }
+            if (megaBigPhotos.includes(fileName)) gridItem.classList.add('mega-big');
+            else if (extraBigPhotos.includes(fileName)) gridItem.classList.add('extra-big');
+            else if (bigPhotos.includes(fileName)) gridItem.classList.add('big');
           }
     
           const img = document.createElement('img');
@@ -290,14 +270,12 @@
           img.alt = fileName;
           gridItem.appendChild(img);
     
-          // Se l'immagine NON è "brushed", apri il modal al click
           if (category !== "brushed") {
             gridItem.addEventListener("click", function() {
               openModal(img.src, img.alt);
             });
           }
     
-          // Per immagini "brushed" gestisci l'alternanza versione e apri il modal
           if (category === "brushed") {
             gridItem.setAttribute("data-state", "original");
             gridItem.setAttribute("data-original", img.src);
@@ -332,19 +310,15 @@
           img.addEventListener("load", () => resizeGridItem(gridItem));
         });
     
-        // Ridimensiona la griglia
         setTimeout(resizeAllGridItems, 500);
     
-        // 4) Funzionalità di filtro e contatti
         const navLinks = document.querySelectorAll('.portfolio-nav a');
         navLinks.forEach(link => {
           link.addEventListener('click', function(e) {
             e.preventDefault();
             const filter = link.getAttribute('data-filter');
-            // Se si clicca su "Contatti", apri il modal dei contatti
             if(filter === 'contact'){
               openContactModal();
-              // Rimuovi la classe active da tutti e aggiungila solo al link corrente
               navLinks.forEach(l => l.classList.remove('active'));
               link.classList.add('active');
               return;
@@ -371,7 +345,6 @@
           });
         });
     
-        // Ridimensiona la griglia al resize della finestra
         window.addEventListener('resize', resizeAllGridItems);
       })
       .catch(error => console.error('Errore nel caricamento del JSON:', error));
