@@ -107,7 +107,7 @@
       text-align: center;
       opacity: 0.8;
     }
-    /* Stili per il modal overlay (lightbox) */
+    /* Stili per il modal overlay (lightbox e contatti) */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -119,18 +119,13 @@
       align-items: center;
       justify-content: center;
       z-index: 2000;
-      cursor: zoom-out;
-    }
-    .modal-overlay img {
-      max-width: 90vw;
-      max-height: 90vh;
-      object-fit: contain;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- Menu di navigazione per il filtro -->
+  <!-- Menu di navigazione per il filtro e contatti -->
   <nav class="portfolio-nav">
     <ul>
       <li><a href="#" data-filter="all" class="active">All</a></li>
@@ -141,6 +136,7 @@
       <li><a href="#" data-filter="conventional">Conventional</a></li>
       <li><a href="#" data-filter="justobjects">JustObjects</a></li>
       <li><a href="#" data-filter="sciencefiction">ScienceFiction</a></li>
+      <li><a href="#" data-filter="contact">Contatti</a></li>
     </ul>
   </nav>
 
@@ -156,6 +152,9 @@
       const modalImg = document.createElement('img');
       modalImg.src = src;
       modalImg.alt = alt;
+      modalImg.style.maxWidth = "90vw";
+      modalImg.style.maxHeight = "90vh";
+      modalImg.style.objectFit = "contain";
       
       overlay.appendChild(modalImg);
       document.body.appendChild(overlay);
@@ -163,6 +162,47 @@
       // Chiude il modal al click
       overlay.addEventListener('click', function() {
         document.body.removeChild(overlay);
+      });
+    }
+    
+    // Funzione per aprire il modal dei contatti
+    function openContactModal() {
+      const overlay = document.createElement('div');
+      overlay.classList.add('modal-overlay');
+      
+      // Contenitore per le informazioni di contatto
+      const contactContainer = document.createElement('div');
+      contactContainer.style.backgroundColor = "#fff";
+      contactContainer.style.padding = "20px";
+      contactContainer.style.borderRadius = "8px";
+      contactContainer.style.textAlign = "center";
+      contactContainer.style.maxWidth = "90vw";
+      contactContainer.style.maxHeight = "90vh";
+      contactContainer.style.cursor = "default";
+      
+      // Nome d'arte e informazioni di contatto
+      const artistName = document.createElement('h2');
+      artistName.textContent = "Nome d'arte: Il Mago della Luce"; // Modifica il nome come preferisci
+      
+      const emailInfo = document.createElement('p');
+      emailInfo.innerHTML = 'Contattami via email: <a href="mailto:artist@example.com">artist@example.com</a>';
+      
+      const instagramInfo = document.createElement('p');
+      instagramInfo.innerHTML = 'Instagram: <a href="https://instagram.com/artist" target="_blank">@artist</a>';
+      
+      contactContainer.appendChild(artistName);
+      contactContainer.appendChild(emailInfo);
+      contactContainer.appendChild(instagramInfo);
+      
+      overlay.appendChild(contactContainer);
+      document.body.appendChild(overlay);
+      
+      // Chiude il modal al click fuori dal contenitore
+      overlay.addEventListener('click', function(e) {
+        // Impedisci la chiusura se si clicca sul contenitore
+        if(e.target === overlay){
+          document.body.removeChild(overlay);
+        }
       });
     }
     
@@ -226,8 +266,13 @@
         // 3) Crea gli elementi della griglia
         const grid = document.getElementById('portfolio-grid');
         allImages.forEach(({ fileName, category }) => {
+          // Salva il nome della cartella così com'è per il path
+          const folder = category;
+          // Usa il lowercase per il filtro
+          const filterClass = category.toLowerCase();
+    
           const gridItem = document.createElement('div');
-          gridItem.classList.add('grid-item', category);
+          gridItem.classList.add('grid-item', filterClass);
     
           // Se la foto non appartiene a "brushed", applica la classe in base al livello
           if (category !== "brushed") {
@@ -241,7 +286,7 @@
           }
     
           const img = document.createElement('img');
-          img.src = `${category}/${fileName}`;
+          img.src = `${folder}/${fileName}`;
           img.alt = fileName;
           gridItem.appendChild(img);
     
@@ -258,7 +303,7 @@
             gridItem.setAttribute("data-original", img.src);
     
             const modifiedSrc = customBrushedMapping[fileName]
-              ? `${category}/${customBrushedMapping[fileName]}`
+              ? `${folder}/${customBrushedMapping[fileName]}`
               : img.src;
             gridItem.setAttribute("data-modified", modifiedSrc);
     
@@ -290,12 +335,20 @@
         // Ridimensiona la griglia
         setTimeout(resizeAllGridItems, 500);
     
-        // 4) Funzionalità di filtro
+        // 4) Funzionalità di filtro e contatti
         const navLinks = document.querySelectorAll('.portfolio-nav a');
         navLinks.forEach(link => {
           link.addEventListener('click', function(e) {
             e.preventDefault();
             const filter = link.getAttribute('data-filter');
+            // Se si clicca su "Contatti", apri il modal dei contatti
+            if(filter === 'contact'){
+              openContactModal();
+              // Rimuovi la classe active da tutti e aggiungila solo al link corrente
+              navLinks.forEach(l => l.classList.remove('active'));
+              link.classList.add('active');
+              return;
+            }
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
     
