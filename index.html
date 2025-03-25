@@ -44,7 +44,13 @@
       gap: 10px;
       padding: 1rem;
     }
-    /* Elementi della griglia: per il layout statico usiamo sempre valori interi */
+    /* Media query per dispositivi mobili: abbassiamo il min-width per avere più colonne */
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+    /* Elementi della griglia */
     .grid-item {
       position: relative;
       overflow: hidden;
@@ -57,7 +63,7 @@
       height: auto;
       display: block;
     }
-    /* Hover effect differenziato in base al livello */
+    /* Hover effect (applicato solo su dispositivi con hover) */
     @media (hover: hover) and (pointer: fine) {
       /* Livello 1: "big" */
       .grid-item.big:hover {
